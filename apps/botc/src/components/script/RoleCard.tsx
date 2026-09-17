@@ -14,7 +14,11 @@ import {
   formatRoleDisplayName,
   getEnglishRoleName,
 } from '@/utils/roleDisplayName'
-import { getProxiedImageUrl, getImageScale } from '@/utils/imageUrl'
+import {
+  getProxiedImageUrl,
+  getImageScale,
+  getImagePosition,
+} from '@/utils/imageUrl'
 import { useDisplayOptionsStore } from '@/stores/displayOptionsStore'
 
 interface RoleCardProps {
@@ -96,6 +100,7 @@ export function RoleCard({
         flexShrink: 0,
         scale: getImageScale(role.image),
         objectFit: 'cover',
+        transformOrigin: getImagePosition(role.image),
         display: 'block',
       }}
     />
@@ -263,6 +268,7 @@ export function RoleCard({
                         width: '100%',
                         height: '100%',
                         objectFit: 'cover',
+                        transformOrigin: getImagePosition(hater.image),
                         verticalAlign: 'baseline',
                         scale: getImageScale(hater.image),
                       }}
@@ -352,6 +358,7 @@ export function RoleCard({
                         width: '100%',
                         height: '100%',
                         objectFit: 'cover',
+                        transformOrigin: getImagePosition(jinx.role1Image),
                         scale: getImageScale(jinx.role1Image),
                       }}
                     />
@@ -373,6 +380,7 @@ export function RoleCard({
                         width: '100%',
                         height: '100%',
                         objectFit: 'cover',
+                        transformOrigin: getImagePosition(jinx.role2Image),
                         scale: getImageScale(jinx.role2Image),
                       }}
                     />

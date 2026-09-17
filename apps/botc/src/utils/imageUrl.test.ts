@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { getProxiedImageUrl, getImageScale } from './imageUrl'
+import { getProxiedImageUrl, getImageScale, getImagePosition, getKickstarterImageUrl, applyIconStyle } from './imageUrl'
 
 describe('imageUrl utilities', () => {
   describe('getProxiedImageUrl', () => {
@@ -56,6 +56,75 @@ describe('imageUrl utilities', () => {
     it('should work with URLs containing wiki.bloodontheclocktower.com anywhere', () => {
       const url = 'https://cdn.wiki.bloodontheclocktower.com/image.png'
       expect(getImageScale(url)).toBe(1.3)
+    })
+
+    it('should return 1.3 for Kickstarter icon URLs', () => {
+      const url = getKickstarterImageUrl('alchemist')
+      expect(getImageScale(url)).toBe(1.3)
+    })
+  })
+
+  describe('getImagePosition', () => {
+    it('should return undefined for undefined input', () => {
+      expect(getImagePosition(undefined)).toBeUndefined()
+    })
+
+    it('should return undefined for wiki URLs', () => {
+      const wikiUrl = 'https://wiki.bloodontheclocktower.com/images/thumb/image.png'
+      expect(getImagePosition(wikiUrl)).toBeUndefined()
+    })
+
+    it('should return undefined for non-wiki, non-kickstarter URLs', () => {
+      expect(getImagePosition('https://example.com/image.png')).toBeUndefined()
+    })
+
+    it('should return adjusted position for Kickstarter icon URLs', () => {
+      const url = getKickstarterImageUrl('alchemist')
+      expect(getImagePosition(url)).toBe('50% 25%')
+    })
+  })
+
+  describe('getKickstarterImageUrl', () => {
+    it('should generate correct URL from role ID', () => {
+      expect(getKickstarterImageUrl('alchemist')).toBe(
+        'https://raw.githubusercontent.com/tomozbot/botc-icons/main/WEBP/alchemist.webp',
+      )
+    })
+
+    it('should handle multi-word role IDs', () => {
+      expect(getKickstarterImageUrl('bountyhunter')).toBe(
+        'https://raw.githubusercontent.com/tomozbot/botc-icons/main/WEBP/bountyhunter.webp',
+      )
+    })
+  })
+
+  describe('applyIconStyle', () => {
+    const roles = [
+      { id: 'alchemist', image: 'https://wiki.bloodontheclocktower.com/images/5/54/Icon_alchemist.png', name: 'Alchemist' },
+      { id: 'chef', image: 'https://wiki.bloodontheclocktower.com/images/a/ab/Icon_chef.png', name: 'Chef' },
+    ]
+
+    it('should return roles unchanged for wiki style', () => {
+      const result = applyIconStyle(roles, 'wiki')
+      expect(result).toBe(roles)
+    })
+
+    it('should replace images with Kickstarter URLs for kickstarter style', () => {
+      const result = applyIconStyle(roles, 'kickstarter')
+      expect(result[0].image).toBe(getKickstarterImageUrl('alchemist'))
+      expect(result[1].image).toBe(getKickstarterImageUrl('chef'))
+    })
+
+    it('should preserve other role properties when applying kickstarter style', () => {
+      const result = applyIconStyle(roles, 'kickstarter')
+      expect(result[0].name).toBe('Alchemist')
+      expect(result[0].id).toBe('alchemist')
+    })
+
+    it('should not mutate the original array', () => {
+      const original = roles[0].image
+      applyIconStyle(roles, 'kickstarter')
+      expect(roles[0].image).toBe(original)
     })
   })
 })
